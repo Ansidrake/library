@@ -1,0 +1,15 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Your Books</h2>
+    <div class="list-group">
+        {% for book in books %}
+        <a href="{{ url_for('book_details', book_id=book.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            {{ book.title }}
+            <button class="btn btn-primary btn-sm">View</button>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

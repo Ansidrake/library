@@ -1,0 +1,18 @@
+{% extends 'base_librarian.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-white">Book Details</h2>
+    <div class="card text-white bg-dark mb-3">
+        <div class="card-header">{{ book.title }}</div>
+        <div class="card-body">
+            <h5 class="card-title">Author: {{ book.author }}</h5>
+            <p class="card-text">Content:</p>
+            <div class="card-text">
+                <pre>{{ book.content }}</pre>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

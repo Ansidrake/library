@@ -1,0 +1,30 @@
+{% extends 'base_librarian.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Statistics</h1>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Total Books</h5>
+                    <p class="card-text">{{ total_books }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">Total Sections</h5>
+                    <p class="card-text">{{ total_sections }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-5">
+        <div class="chart">
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

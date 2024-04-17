@@ -1,0 +1,35 @@
+{% extends 'base_librarian.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Add New Book</h2>
+    <form method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.author.label(class="form-label") }}
+            {{ form.author(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.content.label(class="form-label") }}
+            {{ form.content(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.section_id.label(class="form-label") }}
+            {{ form.section_id(class="form-select") }}
+        </div>
+        <div class="mb-3">
+            {{ form.price.label(class="form-label") }}
+            {{ form.price(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.pdf.label(class="form-label") }}
+            {{ form.pdf(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Add Book</button>
+    </form>
+</div>
+{% endblock %}

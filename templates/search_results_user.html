@@ -1,0 +1,12 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Search Results for "{{ search_query }}"</h2>
+    <div class="list-group">
+        {% for book in books %}
+        <a href="#" class="list-group-item list-group-item-action">{{ book.title }} by {{ book.author }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

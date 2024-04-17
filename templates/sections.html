@@ -1,0 +1,21 @@
+{% extends 'base_librarian.html' %}
+
+{% block content %}
+<div class="container text-light">
+    <h1 class="mb-4">Sections</h1>
+    <hr class="bg-light">
+    {% for section in sections %}
+    <div class="mt-4">
+        <h2 class="text-light">{{ section.name }}</h2>
+        <ul class="list-group">
+            {% for book in section.books %}
+            <li class="list-group-item bg-dark border-light text-light">{{ book.title }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+    <div class="mt-4">
+        <a href="{{ url_for('add_section') }}" class="btn btn-primary">Add New Section</a>
+    </div>
+</div>
+{% endblock %}
