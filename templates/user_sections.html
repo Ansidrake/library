@@ -1,4 +1,4 @@
-{% extends 'base_librarian.html' %}
+{% extends 'base_user.html' %}
 
 {% block content %}
 <div class="container text-light">
@@ -9,21 +9,21 @@
         <h2 class="text-light">{{ section.name }}</h2>
         <ul class="list-group">
             {% for book in section.books %}
-            <a href="{{ url_for('book_details', book_id=book.id) }}" class="list-group-item list-group-item-action">
+            <a href="{{ url_for('request_access',user_id = user_id,book_id=book.id) }}" class="list-group-item list-group-item-action">
                 <h5 class="mb-0">{{ book.title }}</h5>
                 <br/>
                 <div class="d-flex w-100 justify-content-between">
                     
                     <small>by {{ book.author }}</small>
-                    <button class="btn btn-primary btn-sm">View</button>
+                    <button class="btn btn-success">request_access</button>
                 </div>
             </a>
             {% endfor %}
-        </ul>
+        </ul> 
     </div>
     {% endfor %}
     <div class="mt-4">
-        <a href="{{ url_for('add_section') }}" class="btn btn-primary">Add New Section</a>
+        <a href="{{ url_for('all_books',user_id = user.id) }}" class="btn btn-primary">All books</a>
     </div>
 </div>
 {% endblock %}

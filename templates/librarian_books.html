@@ -7,7 +7,9 @@
         {% for book in books %}
         <a href="{{ url_for('book_details', book_id=book.id) }}" class="list-group-item list-group-item-action">
             <h5 class="mb-0">{{ book.title }}</h5>
+            <br/>
             <div class="d-flex w-100 justify-content-between">
+                
                 <small>by {{ book.author }}</small>
                 <button class="btn btn-primary btn-sm">View</button>
             </div>

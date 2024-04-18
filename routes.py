@@ -8,15 +8,15 @@ from wtforms.validators import InputRequired, Length, Email, EqualTo, NumberRang
 from app import app
 from forms import RegistrationForm,LoginForm,BookForm,FeedbackForm,SectionForm
 
+
 #from flask_charts import Chart, ChartData
 
 def user_is_valid(username,password):
     user = User.query.filter_by(username=username).first()
     if user is not None:
-        return user.password.data == password
+        return user.password == password
     else:
         return False
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -27,7 +27,8 @@ def login():
             return redirect(url_for('add_book'))
         elif user_is_valid(form.username.data, form.password.data):
             # Redirect to the user's profile page upon successful login
-            return redirect(url_for('user_profile'))
+            user = User.query.filter_by(username=form.username.data).first()
+            return redirect(url_for('owned_books',user_id = user.id))
         else:
             flash('Invalid username or password', 'error')
     return render_template('login.html', form=form)
@@ -39,18 +40,16 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         # Check if the username is already taken
-        existing_user = User.query.filter_by(username=form.username.data).first()
-        if existing_user:
-            flash('Username is already taken. Please choose a different one.', 'error')
-            return redirect(url_for('register'))
+        #existing_user = User.query.filter_by(username=form.username.data).first()
+        #if existing_user:
+        #    flash('Username is already taken. Please choose a different one.', 'error')
+        #    return redirect(url_for('register'))
 
         # Create a new user object with the form data
-        new_user = User(username=form.username.data, email=form.email.data)
-        new_user.set_password(form.password.data)  # Assuming you have a method to hash the password
+        new_user = User(username=form.username.data,password = form.password.data,role = 'User')
         db.session.add(new_user)
         db.session.commit()
         form.username.data = ''
-        form.email.data = ''
         form.password.data = ''
         form.confirm_password.data = ''   
 
@@ -81,9 +80,9 @@ def add_book():
         author = form.author.data
         content = form.content.data
         section_id = form.section_id.data
-        price =  form.price.data
         
-        new_book = Book(title=title, author=author, content=content, section_id=section_id, price=price)
+        
+        new_book = Book(title=title, author=author, content=content, section_id=section_id)
         
         db.session.add(new_book)
         db.session.commit()
@@ -92,24 +91,34 @@ def add_book():
         form.author.data = ''
         form.content.data = ''
         form.section_id.data = ''
-        form.price.data = ''
+        
         flash('Book added successfully!', 'success')
-        return redirect(url_for('librarian_books'))  # Assuming user_books is the route to display user's books
+        return redirect(url_for('librarian_books'))  # Assuming owned_books is the route to display user's books
     return render_template('add_book.html', form=form)
 
 
 @app.route('/librarian_books')
 def librarian_books():
-    # Retrieve all books from the database
+    
     books = Book.query.all()
     return render_template('librarian_books.html', books=books)
+    #except:
+    #    flash('No Books are available!')
+    #    return redirect(url_for('add_book'))
+
+
 
 
 @app.route('/book_requests')
 def book_requests():
     # Retrieve all book requests from the database
-    requests = BookRequest.query.all()
-    return render_template('book_requests.html', requests=requests)
+    try:
+        requests = BookRequest.query.all()
+        return render_template('book_requests.html', requests=requests)
+    except:
+        flash('No Boooks are requested!!')
+        return redirect(url_for(librarian_books))
+
 
 @app.route('/approve_request/<int:request_id>')
 def approve_request(request_id):
@@ -185,10 +194,11 @@ def add_section():
 
 
 
-@app.route('/user_books/<int:user_id>')
-def user_books(user_id):
+@app.route('/all_books/<int:user_id>')
+def all_books(user_id):
     books = Book.query.all()
-    return render_template('user_books.html', books=user_books, user_id = user_id)
+    user = User.query.filter_by(id = user_id ).first()
+    return render_template('all_books.html', books=books, user_id = user.id,user=user)
 
 @app.route('/search_user', methods=['POST'])
 def search():
@@ -198,24 +208,29 @@ def search():
     return render_template('search_results_user.html', books=books, search_query=search_query)
 
 @app.route('/request_access/<int:user_id>/<int:book_id>', methods=['GET', 'POST'])
-def request_access(user_id,book_id):
-    
-    new_request = BookRequest(user_id= user_id,book_id=book_id)  # Assuming you are using Flask-Login for user authentication
-    
-    db.session.add(new_request)
-    db.session.commit()
-    flash('Access request sent successfully.', 'success')
-    return redirect(url_for('user_books'))  # Redirect to the user's books page
+def request_access(user_id, book_id):
+    # Check if the book has already been requested by the user
+    existing_request = BookRequest.query.filter_by(user_id=user_id, book_id=book_id).first()
 
-@app.route('/user_books/<int:user_id>')
-def accessed_books(user_id):
+    if existing_request:
+        flash('Access request for this book has already been sent.', 'error')
+    else:
+        new_request = BookRequest(user_id=user_id, book_id=book_id)
+        db.session.add(new_request)
+        db.session.commit()
+        flash('Access request sent successfully.', 'success')
+
+    return redirect(url_for('user_sections', user_id=user_id)) # Redirect to the user's books page
+
+@app.route('/owned_books/<int:user_id>')
+def owned_books(user_id):
     # Query the book IDs associated with the user from the access database
     user_book_ids = db.session.query(BookAccess.book_id).filter_by(user_id=user_id).all()
 
     # Query the book details for the retrieved book IDs
-    user_books = Book.query.filter(Book.id.in_(user_book_ids)).all()
-
-    return render_template('access_books.html', books=user_books)
+    owned_books = Book.query.filter(Book.id.in_(user_book_ids)).all()
+    user = User.query.filter_by(id = user_id ).first()
+    return render_template('owned_books.html', books=owned_books,user = user)
 
 def remove_expired_access():
     # Calculate the date 7 days ago
@@ -231,4 +246,23 @@ def remove_expired_access():
     # Commit the changes to the database
     db.session.commit()
 
+@app.route('/user_sections/<int:user_id>')
+def user_sections(user_id):
+    sections = Section.query.all()
+    user = User.query.filter_by(id = user_id).first()
+    return render_template('user_sections.html', sections=sections, user = user,user_id = user.id)
 
+@app.route('/user_profile.<int:user_id>')
+def user_profile(user_id):
+    user = User.query.filter_by(id = user_id ).first()
+    return redirect(url_for('owned_books',user = user,user_id = user.id))
+
+@app.route('/')
+def index():
+    return redirect(url_for('login'))
+
+#@app.route('/all_books/<int:user_id>')
+#def all_books(user_id):
+#    books = Book.query.all()
+#    return render_template('all_books.html', books=books,user_id = user_id)
+#    #except:

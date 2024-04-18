@@ -2,12 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h2>All Books</h2>
-    <form action="{{ url_for('search') }}" method="post" class="mb-3">
-        <div class="input-group">
-            <input type="text" class="form-control" name="search_query" placeholder="Search for books">
-            <button class="btn btn-outline-primary" type="submit">Search</button>
-        </div>
+    <h2>My Books</h2>
     </form>
     <div class="list-group">
         {% for book_access in book_accesses %}
@@ -19,7 +14,7 @@
             <p class="mb-1">{{ book_access.book.description }}</p>
             <small>Section: {{ book_access.book.section.name }}</small>
             <div class="btn-group float-end">
-                <a href="{{ url_for('request_access', book_id=book_access.book.id, user_id= user_id) }}" class="btn btn-sm btn-outline-primary">Request</a>
+                <a href="{{ url_for('book_details', book_id=book_access.book.id) }}" class="btn btn-sm btn-outline-primary">View</a>
             </div>
         </div>
         {% endfor %}

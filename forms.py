@@ -5,7 +5,6 @@ from wtforms.validators import InputRequired, Length, Email, EqualTo, NumberRang
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=4, max=20)])
-    email = StringField('Email', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm Password', validators=[InputRequired(), EqualTo('password', message='Passwords must match')])
 
@@ -17,10 +16,8 @@ class BookForm(FlaskForm):
     title = StringField('Title', validators=[InputRequired(), Length(max=100)])
     author = StringField('Author', validators=[InputRequired(), Length(max=100)])
     content = TextAreaField('Content', validators=[InputRequired()])
-    section_id = SelectField('Section',validators=[InputRequired(), NumberRange(min=1)])  # Assuming you have a list of sections to select from
-    price = FloatField('Price', validators=[Optional(), NumberRange(min=0)])  # Optional field for price
-    pdf = FileField('Upload PDF', validators=[Optional()])  # Optional field for uploading PDF
-
+    section_id = IntegerField('Section',validators=[InputRequired(), NumberRange(min=1)])  # Assuming you have a list of sections to select from
+    
 
 class FeedbackForm(FlaskForm):
     comment = TextAreaField('Feedback', validators=[InputRequired()])
