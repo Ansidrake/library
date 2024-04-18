@@ -62,7 +62,7 @@ def register():
 @app.route('/book_details/<int:book_id>')
 def book_details(book_id):
     # Retrieve the book details from the database
-    book = Book.query.get(book_id)
+    book = Book.query.get_or_404(book_id)
     if book:
         return render_template('book_details.html', book=book)
     else:
@@ -99,7 +99,6 @@ def add_book():
 
 @app.route('/librarian_books')
 def librarian_books():
-    
     books = Book.query.all()
     return render_template('librarian_books.html', books=books)
     #except:
@@ -107,11 +106,9 @@ def librarian_books():
     #    return redirect(url_for('add_book'))
 
 
-
-
 @app.route('/book_requests')
 def book_requests():
-    # Retrieve all book requests from the database
+    
     try:
         requests = BookRequest.query.all()
         return render_template('book_requests.html', requests=requests)
@@ -119,46 +116,90 @@ def book_requests():
         flash('No Boooks are requested!!')
         return redirect(url_for(librarian_books))
 
-
+#@app.route('/approve_request/<int:request_id>')
+#def approve_request(request_id):
+#    # Retrieve the book request from the database
+#    request = BookRequest.query.get_or_404(request_id)
+#    
+#    if request is not None:
+#    # Your existing logic here
+#
+#        # Check if the book is already approved
+#        existing_access = BookAccess.query.filter_by(user_id=request.user_id, book_id=request.book_id).first()
+#        if existing_access:
+#            flash('Book request already approved.', 'warning')
+#            db.session.delete(request)  # Remove the request from the requests database
+#            db.session.commit()
+#        else:
+#            # Add the requested book to the access database
+#            user_id=request.user_id
+#            book_id=request.book_id
+#            book_access = BookAccess(user_id=user_id, book_id=book_id)
+#            db.session.add(book_access)
+#            db.session.delete(request)  # Remove the request from the requests database
+#            db.session.commit()
+#            flash('Book request approved successfully.', 'success')
+#    else:
+#        flash('Book request not found.', 'danger')
+#    return redirect(url_for('book_requests'))
 @app.route('/approve_request/<int:request_id>')
 def approve_request(request_id):
-    # Retrieve the book request from the database
-    request = BookRequest.query.get(request_id)
-    if request:
-        # Add the requested book to the access database
-        book_access = BookAccess(user_id=request.user_id, book_id=request.book_id)
-        db.session.add(book_access)
-        db.session.delete(request)  # Remove the request from the requests database
-        db.session.commit()
-        flash('Book request approved successfully.', 'success')
+    request = BookRequest.query.get_or_404(request_id)
+
+    if request is not None:
+        existing_access = BookAccess.query.filter_by(user_id=request.user_id, book_id=request.book_id).first()
+        if existing_access:
+            flash('Book request already approved.', 'warning')
+            db.session.delete(request)
+            db.session.commit()
+        else:
+            try:
+                user_id = request.user_id
+                book_id = request.book_id
+                book_title = Book.query.get(book_id).title
+                print(f"User ID: {user_id}, Book ID: {book_id}")  # Debug message
+                book_access = BookAccess(user_id=user_id, book_id=book_id)
+                db.session.add(book_access)
+                db.session.delete(request)
+                db.session.commit()
+                flash(f'Book request for "{book_title}" approved successfully.', 'success')
+                
+                # Debugging: Check if the access record is added to the database
+                access_record = BookAccess.query.filter_by(user_id=user_id, book_id=book_id).first()
+                if access_record:
+                    print("Access record added successfully:", access_record)
+                else:
+                    print("Access record not found in the database.")
+            except Exception as e:
+                flash('An error occurred while processing the request. Please try again later.', 'danger')
+                print(f'Error: {e}')
     else:
         flash('Book request not found.', 'danger')
     return redirect(url_for('book_requests'))
 
-@app.route('/given_access')
-def given_access():
-    # Retrieve all books with access from the database
-    books_with_access = BookAccess.query.all()
-    # Create a list to store book details
-    books = []
-    # Iterate over books with access and fetch their details
-    for access in books_with_access:
-        book = Book.query.get(access.book_id)
-        if book:
-            books.append(book)
-    return render_template('given_access.html', books=books)
 
-@app.route('/revoke_access/<int:request_id>')
-def revoke_access(request_id):
+
+@app.route('/book_access')
+def book_access():
+    #try:
+    access = BookAccess.query.all()
+    return render_template('book_access.html', access = access)
+    #except:
+    #    flash('No Boooks are given!!')
+    #    return redirect(url_for('librarian_books'))
+
+
+@app.route('/revoke_access/<int:access_id>')
+def revoke_access(access_id):
     # Retrieve the book access record from the database
-    access = BookAccess.query.get(request_id)
+    access = BookAccess.query.get_or_404(access_id)
     if access:
         db.session.delete(access)  # Remove the book access record
         db.session.commit()
         flash('Access revoked successfully.', 'success')
     else:
         flash('Book access record not found.', 'danger')
-    return redirect(url_for('book_requests'))
+    return redirect(url_for('book_access'))
 
 @app.route('/sections')
 def sections():
@@ -202,7 +243,7 @@ def all_books(user_id):
 
 @app.route('/search_user', methods=['POST'])
 def search():
-    search_query = request.form.get('search_query', '')
+    search_query = request.form.get_or_404('search_query', '')
     # Query the database for books matching the search query
     books = Book.query.filter(Book.title.ilike(f'%{search_query}%')).all()
     return render_template('search_results_user.html', books=books, search_query=search_query)
@@ -224,13 +265,13 @@ def request_access(user_id, book_id):
 
 @app.route('/owned_books/<int:user_id>')
 def owned_books(user_id):
-    # Query the book IDs associated with the user from the access database
-    user_book_ids = db.session.query(BookAccess.book_id).filter_by(user_id=user_id).all()
+    # Query the book accesses associated with the user from the database
+    access = BookAccess.query.filter_by(user_id=user_id).all()
+    
+    user = User.query.filter_by(id=user_id).first()
+    
+    return render_template('owned_books.html', access=access, user=user)
 
-    # Query the book details for the retrieved book IDs
-    owned_books = Book.query.filter(Book.id.in_(user_book_ids)).all()
-    user = User.query.filter_by(id = user_id ).first()
-    return render_template('owned_books.html', books=owned_books,user = user)
 
 def remove_expired_access():
     # Calculate the date 7 days ago

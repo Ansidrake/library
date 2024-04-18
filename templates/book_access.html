@@ -2,18 +2,18 @@
 
 {% block content %}
 <div class="container">
-    <h2>Book Requests</h2>
+    <h2>Book Access</h2>
     <div class="list-group">
-        {% for request in requests %}
+        {% for acc in access %}
         <div class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">Book Request</h5>
+                <h5 class="mb-1">Book Access</h5>
                 <div class="btn-group">
-                    <a href="{{ url_for('revoke_access', request_id=request.id) }}" class="btn btn-danger btn-sm">Revoke Access</a>
+                    <a href="{{ url_for('revoke_access', access_id=acc.id) }}" class="btn btn-danger btn-sm">Revoke Access</a>
                 </div>
             </div>
-            <p class="mb-1">User ID: {{ request.user_id }}</p>
-            <p class="mb-1">Book ID: {{ request.book_id }}</p>
+            <p class="mb-1">User ID: {{ acc.user_id }}</p>
+            <p class="mb-1">Book ID: {{ acc.book_id }}</p>
         </div>
         {% endfor %}
     </div>

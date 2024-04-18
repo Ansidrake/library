@@ -2,20 +2,18 @@
 
 {% block content %}
 <div class="container">
-    <h2>My Books</h2>
-    </form>
+    <h2>Book Access</h2>
     <div class="list-group">
-        {% for book_access in book_accesses %}
+        {% for acc in access %}
         <div class="list-group-item list-group-item-action">
             <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">{{ book_access.book.title }}</h5>
-                <small>by {{ book_access.book.author }}</small>
+                <h5 class="mb-1">Book Access</h5>
+                <div class="btn-group">
+                    <a href="{{ url_for('book_details', book_id=acc.book_id) }}" class="btn btn-outline-primary btn-sm">View</a>
+                </div>
             </div>
-            <p class="mb-1">{{ book_access.book.description }}</p>
-            <small>Section: {{ book_access.book.section.name }}</small>
-            <div class="btn-group float-end">
-                <a href="{{ url_for('book_details', book_id=book_access.book.id) }}" class="btn btn-sm btn-outline-primary">View</a>
-            </div>
+            <p class="mb-1">User ID: {{ acc.user_id }}</p>
+            <p class="mb-1">Book ID: {{ acc.book_id }}</p>
         </div>
         {% endfor %}
     </div>

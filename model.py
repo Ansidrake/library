@@ -69,7 +69,7 @@ class BookAccess(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     book_id = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
-    issue_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    issue_date = db.Column(db.DateTime, nullable=True, default=datetime.utcnow)
 
 def init_db():
     with app.app_context():
