@@ -1,10 +1,6 @@
-from flask import Flask, render_template, flash, request, redirect, url_for, send_from_directory
-import os
+from flask import render_template, flash, request, redirect, url_for
 from datetime import datetime, timedelta
 from model import db,User,Book,Section,Feedback,BookAccess,BookRequest
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, IntegerField, FloatField, SelectField, FileField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, NumberRange, Optional
 from app import app
 from forms import RegistrationForm,LoginForm,BookForm,FeedbackForm,SectionForm
 
