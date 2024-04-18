@@ -1,5 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timedelta
+from datetime import datetime
 from app import app,db
 
 
@@ -11,14 +10,7 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(20), nullable=True)
-    #books_accessed = db.relationship('BookAccess', backref='user', lazy=True)
-    #def has_access_to_book(self, book_id):
-    #    # Check if the user has access to the book based on the issue date
-    #    book_access = BookAccess.query.filter_by(user_id=self.id, book_id=book_id).first()
-    #    if book_access:
-    #        return (datetime.utcnow() - book_access.issue_date) < timedelta(days=7)
-    #    return False
-
+    
 class Book(db.Model):
     __tablename__ = 'book'
     __table_args__ = {'extend_existing': True}
@@ -44,8 +36,6 @@ class Section(db.Model):
     description = db.Column(db.Text, nullable=True)
     date_created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     books = db.relationship('Book', backref='section', lazy=True)
-
-    #section = db.relationship('Section', backref=db.backref('books', lazy=True))
 
 class Feedback(db.Model):
     __tablename__ = 'feedback'
@@ -75,7 +65,5 @@ def init_db():
     with app.app_context():
         db.create_all()
     
-
-
 if __name__ == '__main__':
     init_db()

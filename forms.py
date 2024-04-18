@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField, IntegerField, FloatField, SelectField, FileField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, NumberRange, Optional
+from wtforms import StringField, PasswordField, TextAreaField, IntegerField
+from wtforms.validators import InputRequired, Length,  EqualTo, NumberRange
 
 
 class RegistrationForm(FlaskForm):
@@ -16,8 +16,7 @@ class BookForm(FlaskForm):
     title = StringField('Title', validators=[InputRequired(), Length(max=100)])
     author = StringField('Author', validators=[InputRequired(), Length(max=100)])
     content = TextAreaField('Content', validators=[InputRequired()])
-    section_id = IntegerField('Section',validators=[InputRequired(), NumberRange(min=1)])  # Assuming you have a list of sections to select from
-    
+    section_id = IntegerField('Section',validators=[InputRequired(), NumberRange(min=1)])  
 
 class FeedbackForm(FlaskForm):
     comment = TextAreaField('Feedback', validators=[InputRequired()])
