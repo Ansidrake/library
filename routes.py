@@ -5,8 +5,6 @@ from app import app
 from forms import RegistrationForm,LoginForm,BookForm,FeedbackForm,SectionForm
 
 
-
-
 def user_is_valid(username,password):
     user = User.query.filter_by(username=username).first()
     if user is not None:
@@ -20,7 +18,7 @@ def login():
     if form.validate_on_submit():
 
         if form.username.data == 'librarian':
-            return redirect(url_for('add_book'))
+            return redirect(url_for('librarian_dashboard'))
         elif user_is_valid(form.username.data, form.password.data):
 
             user = User.query.filter_by(username=form.username.data).first()
@@ -177,11 +175,11 @@ def all_books(user_id):
     user = User.query.filter_by(id = user_id ).first()
     return render_template('all_books.html', books=books, user_id = user.id,user=user)
 
-@app.route('/search_user', methods=['POST'])
-def search():
+@app.route('/search_user/<int:user_id>', methods=['POST'])
+def search(user_id):
     search_query = request.form.get_or_404('search_query', '')
     books = Book.query.filter(Book.title.ilike(f'%{search_query}%')).all()
-    return render_template('search_results_user.html', books=books, search_query=search_query)
+    return render_template('search_results_user.html', books=books, search_query=search_query,user_id=user_id)
 
 @app.route('/request_access/<int:user_id>/<int:book_id>', methods=['GET', 'POST'])
 def request_access(user_id, book_id):
@@ -228,3 +226,45 @@ def user_profile(user_id):
 @app.route('/')
 def index():
     return redirect(url_for('login'))
+
+@app.route('/search_lib_section', methods=['POST'])
+def search_lib_section():
+    search_query = request.form.get('search_query', '')
+    sections = Section.query.filter(Section.name.ilike(f'%{search_query}%')).all()
+    return render_template('sections.html', sections=sections, search_query=search_query)
+
+@app.route('/search_books', methods=['POST'])
+def search_books():
+    search_query = request.form.get('search_query', '')
+    books = Book.query.filter(Book.title.ilike(f'%{search_query}%')).all()
+    return render_template('search_results_librarian.html', books=books, search_query=search_query)
+
+@app.route('/librarian_dashboard')
+def librarian_dashboard():
+    total_books = Book.query.count()
+    total_users = User.query.count()
+    total_requests = BookRequest.query.count()
+    recent_books = Book.query.order_by(Book.id.desc()).limit(5).all()
+    recent_requests = BookRequest.query.order_by(BookRequest.id.desc()).limit(5).all()
+    return render_template('librarian_dashboard.html', total_books=total_books, total_users=total_users, total_requests=total_requests, recent_books=recent_books, recent_requests=recent_requests)
+
+@app.route('/user_dashboard/<int:user_id>')
+def user_dashboard(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    total_books = BookAccess.query.filter_by(user_id=user_id).count() 
+    total_requests = BookRequest.query.filter_by(user_id=user_id).count()
+    recent_books = BookAccess.query.filter_by(user_id=user_id).order_by(BookAccess.id.desc()).limit(5).all()
+    recent_requests = BookRequest.query.filter_by(user_id=user_id).order_by(BookRequest.id.desc()).limit(5).all()
+    return render_template('user_dashboard.html', total_books=total_books, total_requests=total_requests, recent_books=recent_books, recent_requests=recent_requests, user =user)
+
+@app.route('/return_book/<int:book_id>/<int:user_id>', methods=['GET', 'POST'])
+def return_book(book_id, user_id):
+    access = BookAccess.query.filter_by(book_id=book_id, user_id=user_id).first()
+    if access:
+        db.session.delete(access)
+        db.session.commit()
+        flash('Book returned successfully.', 'success')
+    else:
+        flash('Book access record not found.', 'danger')
+    return redirect(url_for('owned_books', user_id=user_id,book_id = book_id))
+

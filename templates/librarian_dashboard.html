@@ -1,0 +1,55 @@
+{% extends 'base_librarian.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-8">
+        <h1 class="display-4 text-white">Librarian Dashboard</h1>
+        <p class="lead text-white">Welcome to your librarian dashboard. Here you can view some stats and manage your library.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-dark text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Total Books</h5>
+            <p class="card-text">{{ total_books }}</p>
+          </div>
+        </div>
+        <div class="card bg-dark text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Total Users</h5>
+            <p class="card-text">{{ total_users }}</p>
+          </div>
+        </div>
+        <div class="card bg-dark text-white mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Pending Requests</h5>
+            <p class="card-text">{{ total_requests }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="mb-3 text-white">Recent Books</h2>
+        <ul class="list-group border-0">
+          {% for book in recent_books %}
+            <li class="list-group-item list-group-item-action bg-dark text-white border-0">
+              <h5 class="mb-0">{{ book.title }}</h5>
+              <small>{{ book.author }}</small>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h2 class="mb-3 text-white">Pending Requests</h2>
+        <ul class="list-group border-0">
+          {% for request in recent_requests %}
+            <li class="list-group-item list-group-item-action bg-dark text-white border-0">
+              <h5 class="mb-0">{{ request.book.title }}</h5>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}

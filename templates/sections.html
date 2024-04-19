@@ -1,29 +1,63 @@
 {% extends 'base_librarian.html' %}
 
 {% block content %}
-<div class="container text-light">
-    <h1 class="mb-4">Sections</h1>
-    <hr class="bg-dark">
-    {% for section in sections %}
-    <div class="mt-4">
-        <h2 class="text-light">{{ section.name }}</h2>
-        <ul class="list-group">
-            {% for book in section.books %}
-            <a href="{{ url_for('book_details', book_id=book.id) }}" class="list-group-item list-group-item-action">
-                <h5 class="mb-0">{{ book.title }}</h5>
-                <br/>
-                <div class="d-flex w-100 justify-content-between">
-                    
-                    <small>by {{ book.author }}</small>
-                    <button class="btn btn-primary btn-sm">View</button>
+<div class="container">
+    <h1 class="text-light mb-4">Sections</h1>
+    <hr class="bg-light">
+    <form action="{{ url_for('search_lib_section') }}" method="post" class="mt-4">
+        <div class="input-group">
+            <input type="text" name="search_query" class="form-control bg-dark text-light" placeholder="Search sections...">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </div>
+    </form>
+    {% if search_query %}
+        <h2 class="text-light">Search results for "{{ search_query }}":</h2>
+        {% if sections %}
+            <ul>
+            {% for section in sections %}
+                <div class="mt-4">
+                    <h2 class="text-light">{{ section.name }}</h2>
+                    <ul class="list-group border-light">
+                        {% for book in section.books %}
+                            <a href="{{ url_for('book_details', book_id=book.id) }}" class="list-group-item list-group-item-action bg-dark text-light border-light">
+                                <h5 class="mb-0">{{ book.title }}</h5>
+                                <br/>
+                                <div class="d-flex w-100 justify-content-between">
+                                    <small>by {{ book.author }}</small>
+                                    <button class="btn btn-primary btn-sm">View</button>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </ul>
                 </div>
-            </a>
             {% endfor %}
-        </ul>
-    </div>
-    {% endfor %}
-    <div class="mt-4">
-        <a href="{{ url_for('add_section') }}" class="btn btn-primary">Add New Section</a>
-    </div>
+            </ul>
+        {% else %}
+            <p class="text-light">No results found.</p>
+        {% endif %}
+    {% else %}
+        {% for section in sections %}
+            <div class="mt-4">
+                <h2 class="text-light">{{ section.name }}</h2>
+                <ul class="list-group border-light">
+                    {% for book in section.books %}
+                        <a href="{{ url_for('book_details', book_id=book.id) }}" class="list-group-item list-group-item-action bg-dark text-light border-light">
+                            <h5 class="mb-0">{{ book.title }}</h5>
+                            <br/>
+                            <div class="d-flex w-100 justify-content-between">
+                                <small>by {{ book.author }}</small>
+                                <button class="btn btn-primary btn-sm">View</button>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+        <div class="mt-4">
+            <a href="{{ url_for('add_section') }}" class="btn btn-primary">Add New Section</a>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

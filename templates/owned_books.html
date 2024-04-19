@@ -6,10 +6,11 @@
     <div class="list-group">
         {% for acc in access %}
         <div class="list-group-item list-group-item-action">
-            <div class="d-flex w-100 justify-content-between">
+            <div class="d-flex w-100 justify-content-between align-items-center">
                 <h5 class="mb-1">Book Access</h5>
                 <div class="btn-group">
-                    <a href="{{ url_for('book_details', book_id=acc.book_id) }}" class="btn btn-outline-primary btn-sm">View</a>
+                    <a href="{{ url_for('book_details', book_id=acc.book_id) }}" class="btn btn-outline-secondary btn-sm">View</a>
+                    <a href="{{ url_for('return_book', book_id=acc.book_id, user_id=user.id) }}" class="btn btn-outline-danger btn-sm">Return</a>
                 </div>
             </div>
             <p class="mb-1">User ID: {{ acc.user_id }}</p>

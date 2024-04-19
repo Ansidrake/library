@@ -1,0 +1,48 @@
+{% extends 'base_user.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-8">
+        <h1 class="display-4">User Dashboard</h1>
+        <p class="lead">Welcome to your user dashboard. Here you can view some stats and manage your library.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Total Books</h5>
+            <p class="card-text">{{ total_books }}</p>
+          </div>
+        </div>
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Total Requests</h5>
+            <p class="card-text">{{ total_requests }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <h2 class="mb-3">Recent Book (ID)</h2>
+        <ul class="list-group">
+          {% for book in recent_books %}
+            <li class="list-group-item list-group-item-action">
+              <h5 class="mb-0">{{ book.id }}</h5>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h2 class="mb-3">Recent Requests (ID)</h2>
+        <ul class="list-group">
+          {% for request in recent_requests %}
+            <li class="list-group-item list-group-item-action">
+              <h5 class="mb-0">{{ request.id }}</h5>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endblock %}

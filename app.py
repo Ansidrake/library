@@ -11,5 +11,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS']  = os.getenv('SQLALCHEMY_TRACK_MODI
 app.config['SECRET_KEY']  = os.getenv('SECRET_KEY')
 db = SQLAlchemy(app)
 
+
 import model
 import routes
